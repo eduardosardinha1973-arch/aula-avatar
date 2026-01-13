@@ -2,70 +2,24 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Avatar Design Buddy</title>
-    <script src="https://unpkg.com/@heygen/streaming-avatar@1.0.2/dist/index.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Buddy Login</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-        #canvas { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        button { 
-            position: absolute; z-index: 100; padding: 15px 30px; font-size: 18px; 
-            cursor: pointer; border-radius: 50px; border: none; 
-            background: #3f8b8c; color: white; font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+        #avatar-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .login-msg { color: white; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <button id="btn">Iniciar Consultoria de Design</button>
-    <div id="canvas"></div>
+    <div id="avatar-container">
+        <iframe 
+            src="https://app.heygen.com/interactive-avatar/073b60a9-89a8-45aa-8902-c358f64d2852" 
+            allow="microphone"
+            title="Design Buddy">
+        </iframe>
+    </div>
 
-    <script>
-        const btn = document.getElementById('btn');
-        let avatar = null;
-
-        async function start() {
-            btn.innerText = "A ligar ao tutor...";
-            btn.disabled = true;
-
-            // Teus dados confirmados
-            const API_KEY = '0cadfbf8-eedc-11f0-a99e-066a7fa2e369';
-            const AVATAR_ID = '073b60a9-89a8-45aa-8902-c358f64d2852';
-
-            try {
-                // Aceder à classe correta do SDK
-                const StreamingAvatar = window.HeyGenStreamingAvatar.default;
-                avatar = new StreamingAvatar({ token: API_KEY });
-
-                // Configurar o evento de receção do vídeo ANTES de começar
-                avatar.on('stream_ready', (event) => {
-                    console.log("Stream pronta!");
-                    const videoEl = document.createElement('video');
-                    videoEl.srcObject = event.detail;
-                    videoEl.autoplay = true;
-                    videoEl.playsInline = true;
-                    
-                    const canvas = document.getElementById('canvas');
-                    canvas.innerHTML = ''; // Limpa o carregamento
-                    canvas.appendChild(videoEl);
-                    btn.style.display = 'none';
-                });
-
-                // Iniciar o avatar
-                await avatar.createStartAvatar({
-                    avatarName: AVATAR_ID,
-                    quality: "medium"
-                });
-
-            } catch (err) {
-                console.error("Erro na ligação:", err);
-                btn.innerText = "Erro: Verifica a tua API Key";
-                btn.disabled = false;
-            }
-        }
-
-        btn.onclick = start;
-    </script>
 </body>
 </html>
