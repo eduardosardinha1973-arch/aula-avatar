@@ -2,18 +2,53 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Avatar Interativo</title>
+    <script src="https://unpkg.com/@heygen/streaming-avatar@latest/dist/index.js"></script>
     <style>
-        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: transparent; }
-        #avatar-container { width: 100%; max-width: 720px; aspect-ratio: 16/9; }
+        body { margin: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+        #canvas { width: 100%; height: 100%; }
+        button { 
+            position: absolute; z-index: 100; padding: 15px 30px; font-size: 18px; 
+            cursor: pointer; border-radius: 50px; border: none; 
+            background: #3f8b8c; color: white; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
 
-    <div id="avatar-container">
-        <p>A carregar avatar...</p>
-    </div>
+    <button id="btn">Iniciar Consultoria de Design</button>
+    <div id="canvas"></div>
 
+    <script>
+        const btn = document.getElementById('btn');
+        let avatar = null;
+
+        async function start() {
+            btn.innerText = "A ligar ao tutor...";
+            btn.disabled = true;
+
+            // Substitui apenas estes dois valores
+            const API_KEY = '0cadfbf8-eedc-11f0-a99e-066a7fa2e369';
+            const AVATAR_ID = '073b60a9-89a8-45aa-8902-c358f64d2852';
+
+            try {
+                avatar = new StreamingAvatar({ token: API_KEY });
+                
+                await avatar.createStartAvatar({
+                    avatarName: AVATAR_ID,
+                    quality: "medium",
+                    renderCanvas: document.getElementById('canvas')
+                });
+
+                btn.style.display = 'none';
+            } catch (err) {
+                console.error("Erro:", err);
+                btn.innerText = "Erro ao ligar. Tenta de novo.";
+                btn.disabled = false;
+            }
+        }
+
+        btn.onclick = start;
+    </script>
 </body>
 </html>
