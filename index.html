@@ -2,10 +2,12 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <script src="https://unpkg.com/@heygen/streaming-avatar@latest/dist/index.js"></script>
+    <title>Avatar Design Buddy</title>
+    <script src="https://unpkg.com/@heygen/streaming-avatar@1.0.2/dist/index.js"></script>
     <style>
         body { margin: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-        #canvas { width: 100%; height: 100%; }
+        #canvas { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: cover; }
         button { 
             position: absolute; z-index: 100; padding: 15px 30px; font-size: 18px; 
             cursor: pointer; border-radius: 50px; border: none; 
@@ -27,36 +29,38 @@
             btn.innerText = "A ligar ao tutor...";
             btn.disabled = true;
 
+            // Teus dados confirmados
             const API_KEY = '0cadfbf8-eedc-11f0-a99e-066a7fa2e369';
             const AVATAR_ID = '073b60a9-89a8-45aa-8902-c358f64d2852';
 
             try {
-                // Criar a instância do Avatar
-                avatar = new HeyGenStreamingAvatar.default({ token: API_KEY });
-                
-                // Iniciar o avatar usando as definições que já tens na HeyGen
-                await avatar.createStartAvatar({
-                    avatarName: AVATAR_ID,
-                    quality: "medium",
-                    knowledgeId: AVATAR_ID // Usa o ID do avatar também como ID de conhecimento
-                });
+                // Aceder à classe correta do SDK
+                const StreamingAvatar = window.HeyGenStreamingAvatar.default;
+                avatar = new StreamingAvatar({ token: API_KEY });
 
-                // Definir onde o vídeo aparece
+                // Configurar o evento de receção do vídeo ANTES de começar
                 avatar.on('stream_ready', (event) => {
+                    console.log("Stream pronta!");
                     const videoEl = document.createElement('video');
                     videoEl.srcObject = event.detail;
                     videoEl.autoplay = true;
-                    videoEl.setAttribute('playsinline', '');
-                    videoEl.style.width = '100%';
-                    videoEl.style.height = '100%';
-                    videoEl.style.objectFit = 'cover';
-                    document.getElementById('canvas').appendChild(videoEl);
+                    videoEl.playsInline = true;
+                    
+                    const canvas = document.getElementById('canvas');
+                    canvas.innerHTML = ''; // Limpa o carregamento
+                    canvas.appendChild(videoEl);
                     btn.style.display = 'none';
                 });
 
+                // Iniciar o avatar
+                await avatar.createStartAvatar({
+                    avatarName: AVATAR_ID,
+                    quality: "medium"
+                });
+
             } catch (err) {
-                console.error("Erro detalhado:", err);
-                btn.innerText = "Erro ao ligar. Tenta de novo.";
+                console.error("Erro na ligação:", err);
+                btn.innerText = "Erro: Verifica a tua API Key";
                 btn.disabled = false;
             }
         }
