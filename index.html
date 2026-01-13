@@ -27,22 +27,35 @@
             btn.innerText = "A ligar ao tutor...";
             btn.disabled = true;
 
-            // Substitui apenas estes dois valores
             const API_KEY = '0cadfbf8-eedc-11f0-a99e-066a7fa2e369';
             const AVATAR_ID = '073b60a9-89a8-45aa-8902-c358f64d2852';
 
             try {
-                avatar = new StreamingAvatar({ token: API_KEY });
+                // Criar a instância do Avatar
+                avatar = new HeyGenStreamingAvatar.default({ token: API_KEY });
                 
+                // Iniciar o avatar usando as definições que já tens na HeyGen
                 await avatar.createStartAvatar({
                     avatarName: AVATAR_ID,
                     quality: "medium",
-                    renderCanvas: document.getElementById('canvas')
+                    knowledgeId: AVATAR_ID // Usa o ID do avatar também como ID de conhecimento
                 });
 
-                btn.style.display = 'none';
+                // Definir onde o vídeo aparece
+                avatar.on('stream_ready', (event) => {
+                    const videoEl = document.createElement('video');
+                    videoEl.srcObject = event.detail;
+                    videoEl.autoplay = true;
+                    videoEl.setAttribute('playsinline', '');
+                    videoEl.style.width = '100%';
+                    videoEl.style.height = '100%';
+                    videoEl.style.objectFit = 'cover';
+                    document.getElementById('canvas').appendChild(videoEl);
+                    btn.style.display = 'none';
+                });
+
             } catch (err) {
-                console.error("Erro:", err);
+                console.error("Erro detalhado:", err);
                 btn.innerText = "Erro ao ligar. Tenta de novo.";
                 btn.disabled = false;
             }
